@@ -111,15 +111,31 @@ vector<vector<double> > tandem(int num_particles, int num_examples,
     Tandem alg(num_orbitals, num_particles, wave_function);
     vector<double> two_matrix = alg.run();
     res.at(i) = log_cholesky_decomp(two_matrix, previous, num_orbitals);
-    if (i % 100 == 0){
-      printf("\r%i/%i", (int)i, num_examples);
-      fflush(stdout);
-    }
+    // if (i % 100 == 0){
+    //   printf("\r%i/%i", (int)i, num_examples);
+    //   fflush(stdout);
+    // }
   }
-  printf("\r%i/%i\n", num_examples, num_examples);
+  // printf("\r%i/%i\n", num_examples, num_examples);
   return res;
 }
 
+void run_and_save(string file_name, int num_particles, int num_examples,
+		  int num_orbitals, string distribution)
+{
+  vector<vector<double> > res = tandem(num_particles, num_examples,
+				       num_orbitals, distribution);
+  ofstream file;
+  file.open(file_name, std::ios_base::app);
+  for (size_t i = 0; i < res.size(); i++) {
+    file << 1 << " ";
+    for (size_t j = 0; j < res.at(i).size(); j++){
+      file << res.at(i).at(j) << " ";
+    }
+    file << endl;
+  }
+  file.close();
+}
 
 int main(int argc, char **argv) {
   size_t num_particles;
@@ -174,19 +190,17 @@ int main(int argc, char **argv) {
     print_usage(num_orbitals);
     return 1;
   }
-  vector<vector<double> > res = tandem(num_particles, num_examples,
-				       num_orbitals, distribution);
-  cout << "Saving to file.. \n"; 
-  ofstream file;
-  file.open(file_name);
-  // label
-  for (size_t i = 0; i < res.size(); i++) {
-    file << 1 << " ";
-    for (size_t j = 0; j < res.at(i).size(); j++){ 
-      file << res.at(i).at(j) << " ";
-    }
-    file << endl;
+  double batch_size = 200;
+  int num_batches = int(num_examples / batch_size);
+  int leftovers = num_examples - num_batches * batch_size;
+  for (int i = 0; i < num_batches; i++){
+    run_and_save(file_name, num_particles, batch_size,
+		 num_orbitals, distribution);
+    printf("\r%i/%i", int((i+1) * batch_size), int(num_examples));
+    fflush(stdout);
   }
-  file.close();
+  run_and_save(file_name, num_particles, leftovers,
+  	       num_orbitals, distribution);
+  printf("\r%i/%i\n", int(num_examples), int(num_examples));
   return 0;
 }
