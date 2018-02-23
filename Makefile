@@ -3,7 +3,7 @@ CFLAGS= -std=c++11 -lgsl -lgslcblas -lm -lboost_system -lboost_filesystem -fPIC
 PYTHON_VERSION = 2.7
 PYTHON_INCLUDE = /usr/include/python$(PYTHON_VERSION)
 OBJ = tandem.o
-DEPS = conversions.h tandem.h cholesky.cpp
+DEPS = conversions.h tandem.h cholesky.cpp tandem_function_interface.h
 # location of the Boost Python include files and library
 BOOST_INC = /usr/include
 BOOST_LIB = /usr/lib
@@ -26,8 +26,8 @@ libtandem.so : tandem.o
 tandem.o: tandem.cpp $(DEPS)
 	g++ -c -o $@ $< $(CFLAGS)
 
-cli : tandem_cli.cpp tandem.h tandem.o
-	$(CC) -I. -c tandem_cli.cpp --std=c++11	
+cli : tandem_cli.cpp tandem_function_interface.h tandem.o
+	$(CC) -I. -c tandem_cli.cpp --std=c++11
 	$(CC) -o tandem tandem_cli.o tandem.o -lgsl -lgslcblas -lm -lboost_filesystem -lboost_system
 
 debug : tandem_cli.cpp tandem.h tandem.o
