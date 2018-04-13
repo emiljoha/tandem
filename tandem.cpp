@@ -257,8 +257,8 @@ vector<double> Tandem::run() {
     // place in the begining of this method and all those things
     // should be deleted here
     delete [] state1;
-    delete [] state2; 
-    delete [] bitstate1; 
+    delete [] state2;
+    delete [] bitstate1;
     delete [] bitstate2;
     delete [] diff;
     delete [] b1;
