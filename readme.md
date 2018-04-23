@@ -1,4 +1,4 @@
-#TANDEM - TrAce N DEnsity Matrices
+# TANDEM - TrAce N DEnsity Matrices
 
 Reduces N-particle wave functions to 2-particle density matrices.
 
