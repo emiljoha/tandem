@@ -36,7 +36,7 @@ int main() {
   const int num_orbitals = 10;      // Dependent on hamiltonians!
   const int num_particles = 4;      // Dependent on hamiltonians!
   const int num_hamiltonians = 100; // Dependent on hamiltonians!
-  const string file_name_hamiltonians = "../../../data/H.dat";
+  const string file_name_hamiltonians = "H.dat";
   const int basis_length =
       boost::math::binomial_coefficient<double>(num_orbitals, num_particles);
   const int num_examples = 10;
