@@ -38,8 +38,8 @@ int main() {
   vector<vector<double>> expected_two_matrix(num_examples,
                                             vector<double>(dmat_length, 0));
   // Set up files to save to
-  const string file_name_wf = "random_test_cases.wf";
-  const string file_name_dmat = "random_test_cases.red";
+  const string file_name_wf = "random_test_cases_wavefunction.dat";
+  const string file_name_dmat = "random_test_cases_matrices.dat";
   ifstream file_wf(file_name_wf);
   ifstream file_dmat(file_name_dmat);
   // Assert that the files opend succesfully.
