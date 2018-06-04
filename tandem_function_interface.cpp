@@ -53,6 +53,13 @@ void run_and_save(string file_name, int num_particles, int num_examples,
   file.close();
 }
 
+vector<double> tandem_on_wf(vector<double> wave_function, int num_particles,
+			  int num_orbitals){
+  Tandem alg(num_orbitals, num_particles, wave_function);
+  vector<double> two_matrix = alg.run();
+  return log_cholesky_decomp(two_matrix, previous, num_orbitals);
+}
+
 vector<vector<double> > tandem(int num_particles, int num_examples,
 			       int num_orbitals, string distribution)
 {
@@ -126,9 +133,7 @@ vector<vector<double> > tandem(int num_particles, int num_examples,
       wave_function.at(j) = wave_function.at(j) / total_sum;
     }
     assert(abs(abs(wave_function) - 1) < 0.001);
-    Tandem alg(num_orbitals, num_particles, wave_function);
-    vector<double> two_matrix = alg.run();
-    res.at(i) = log_cholesky_decomp(two_matrix, previous, num_orbitals);
+    res.at(i) = tandem_on_wf(wave_function, num_particles, num_orbitals)
     // if (i % 100 == 0){
     //   printf("\r%i/%i", (int)i, num_examples);
     //   fflush(stdout);
