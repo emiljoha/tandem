@@ -22,4 +22,6 @@ BOOST_PYTHON_MODULE(PyTandem) //
   std_mat_from_python_list();
   def("tandem", tandem,
       return_value_policy<return_by_value>());
+  def("tandem_on_wf", tandem_on_wf,
+      return_value_policy<return_by_value>());
 }
