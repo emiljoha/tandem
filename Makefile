@@ -9,7 +9,7 @@ BOOST_INC = /usr/include
 BOOST_LIB = /usr/lib
 # compile mesh classes
 TARGET = PyTandem
-PWD=/nfs/users3/emiljoha/venv-e/ex-job/ANNAN/tandem
+PWD=/nfs/users3/emiljoha/venv-e/tandem
 # LD_LIBRARY_PATH=$(PWD)
 # The mess known as compiling shared library for python bindings.
 $(TARGET).so: $(TARGET).o $(DEPS) tandem.o
