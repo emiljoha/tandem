@@ -1,9 +1,11 @@
 from tempfile import TemporaryFile
 from multiprocessing import Pool
 import numpy as np
+import time
 from google.cloud import storage
 from PyTandem import tandem
 import gc
+import tqdm
 
 def download(cloud_path, bucket):
     blob2 = bucket.get_blob(cloud_path)
@@ -50,24 +52,24 @@ def generate_and_save_to_cloud(args):
         print '%s already exists' % name
         return None
     data = tandem(num_particles, num_examples, num_orbitals, distribution)
-    print name
     gc.collect()
     upload(data, cloud_path, bucket_name='tandem_10')
     # print(name)
     gc.collect()
 
-num_examples = 500
-num_orbitals = 20
+num_examples = 10
+num_orbitals = 10
 arguments = []
-pool = Pool(16)
+pool = Pool(2)
 for distribution in ['zero_spin']:
     for num_particles in [4]:
-        for i in range(96):
+        for i in range(10):
             arguments.append({'distribution': distribution,
                               'num_particles': num_particles,
                               'num_orbitals': num_orbitals,
                               'num_examples': num_examples, 'i': i})
-    pool.map(generate_and_save_to_cloud, arguments)
+    for _ in tqdm.tqdm(pool.imap_unordered(generate_and_save_to_cloud, arguments), total=len(arguments)):
+        pass
     arguments = []
     print(distribution)
 
