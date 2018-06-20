@@ -3,13 +3,13 @@ CFLAGS= -std=c++11 -lgsl -lgslcblas -lm -lboost_system -lboost_filesystem -fPIC
 PYTHON_VERSION = 2.7
 PYTHON_INCLUDE = /usr/include/python$(PYTHON_VERSION)
 OBJ = tandem.o
-DEPS = conversions.h tandem.h cholesky.cpp tandem_function_interface.h
+DEPS = conversions.h tandem.h cholesky.cpp tandem_function_interface.h pairs.h
 # location of the Boost Python include files and library
 BOOST_INC = /usr/include
 BOOST_LIB = /usr/lib
 # compile mesh classes
 TARGET = PyTandem
-PWD=/nfs/users3/emiljoha/venv-e/ex-job/ANNAN/tandem
+PWD=$(pwd)
 # LD_LIBRARY_PATH=$(PWD)
 # The mess known as compiling shared library for python bindings.
 $(TARGET).so: $(TARGET).o $(DEPS) tandem.o

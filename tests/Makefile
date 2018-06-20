@@ -1,10 +1,12 @@
 CC=g++
 CFLAGS=-I. -std=c++11 -g
-DEPS = ../tandem.h ../cholesky.h test.h
+# DEPS = ../tandem.h ../cholesky.h test.h
+#../tandem_function_interface.h, ../pairs.h
+DEPS=../*.h
 OBJ = tandem.o test.o
 LINKFLAGS= -lgsl -lgslcblas -lm -lboost_filesystem -lboost_system
 TESTS = two_way_test.out energy_test.out test_case_0.out test_case_2.out test_case_4.out \
-random_test_cases.out test_cholesky.out	timer.out
+random_test_cases.out test_cholesky.out	timer.out zero_spin.out
 
 all: $(TESTS) HF.wf one_mat.m
 	./two_way_test.out
@@ -15,6 +17,7 @@ all: $(TESTS) HF.wf one_mat.m
 	./random_test_cases.out
 	./test_cholesky.out
 	./timer.out -p 4 -e 200 -f test.cho -d uniform
+	./zero_spin.out
 
 %.out: %.o $(OBJ)
 	g++ -o $@ $^ $(LINKFLAGS)

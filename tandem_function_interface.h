@@ -3,6 +3,7 @@
 #include "tandem_function_interface.h"
 #include "tandem.h"
 #include "cholesky.h"
+#include "pairs.h"
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/linear_congruential.hpp> // not sure if needed
@@ -21,7 +22,7 @@
 #include <unistd.h>
 #include <functional>
 #include <ctime>
-
+#include <assert.h>
 
 double abs(vector<double> vec) {
   double res = 0;
@@ -70,6 +71,17 @@ vector<vector<double> > tandem(int num_particles, int num_examples,
     int pos = distribution.find("-");
     double T = atof(distribution.substr(pos+1).c_str());
     distribution_function = [T](int n)->double { return exp(-n / T); };
+  }
+  else if (distribution.substr(0, 9) == "zero_spin"){
+    // Shame on me, assuming 20 orbitals and Ca40...
+    std::cout << "WARNING: zero_spin, distribution is currently hardcoded for a specific Ca40 basis with 20 spin-orbitals." << endl;
+    assert(num_orbitals == 20);  // minimum sanity check
+    vector<double> energies = {-8.6240, -5.6793, -4.1370, -1.3829};
+    vector<int> spins = {7, 3, 1, 5};
+    double T = 10.0;
+    vector<vector<double>> info = pairs(num_orbitals, num_particles, spins, energies);
+    distribution_function = [T, info](int n)->double {
+      return info.at(n).at(0) * exp(-(info.at(n).at(1) - info.at(0).at(1)) / T);};
   }
   else{
     cout << "Unknown distriution " << optarg << endl;
