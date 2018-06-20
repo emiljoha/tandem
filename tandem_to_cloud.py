@@ -47,24 +47,27 @@ def generate_and_save_to_cloud(args):
                                        num_orbitals, num_examples, i)
     cloud_path = 'data/%s/%s' % (num_orbitals, name)
     if already_exists(cloud_path, bucket_name='tandem_10'):
+        print '%s already exists' % name
         return None
     data = tandem(num_particles, num_examples, num_orbitals, distribution)
+    print name
     gc.collect()
     upload(data, cloud_path, bucket_name='tandem_10')
-    print(name)
+    # print(name)
     gc.collect()
 
 num_examples = 500
 num_orbitals = 20
 arguments = []
-for distribution in ['exponential-1']:
-    for num_particles in [2, 3, 4, 5]:
-        for i in range(100):
+pool = Pool(16)
+for distribution in ['zero_spin']:
+    for num_particles in [4]:
+        for i in range(96):
             arguments.append({'distribution': distribution,
                               'num_particles': num_particles,
                               'num_orbitals': num_orbitals,
                               'num_examples': num_examples, 'i': i})
+    pool.map(generate_and_save_to_cloud, arguments)
+    arguments = []
+    print(distribution)
 
-pool = Pool(16)
-print(pool.map(generate_and_save_to_cloud, arguments))
-                         
