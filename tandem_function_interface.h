@@ -3,6 +3,7 @@
 #include "tandem_function_interface.h"
 #include "tandem.h"
 #include "cholesky.h"
+#include "pairs.h"
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/linear_congruential.hpp> // not sure if needed
@@ -21,7 +22,7 @@
 #include <unistd.h>
 #include <functional>
 #include <ctime>
-
+#include <assert.h>
 
 double abs(vector<double> vec) {
   double res = 0;
@@ -29,6 +30,28 @@ double abs(vector<double> vec) {
     res += vec.at(i) * vec.at(i);
   }
   return sqrt(res);
+}
+
+vector<double> tandem_on_wf(vector<double> wave_function, int num_particles,
+			  int num_orbitals){
+  // There is a chance that the generated 2-matrix have eigenvalues
+  // that are zero. This does not happen very often but when it
+  // happens the cholesky decomposition will fail. To remedy this, on
+  // those occation we make a convex combination of mostly the actual
+  // 2-matrix but also the unit matrix but with trace N(N-1).
+  size_t two_matrix_basis = boost::math::binomial_coefficient<double>(num_orbitals, 2);
+  size_t two_matrix_length = boost::math::binomial_coefficient<double>(two_matrix_basis, 2)
+    + two_matrix_basis;
+  vector<double> previous(two_matrix_length, 0);
+  double element = num_particles * (num_particles - 1) / (double) two_matrix_basis;
+  size_t pos = 0;
+  for (size_t i = 0; i < two_matrix_basis; i++) {
+      previous.at(pos) = element;
+      pos = pos + (two_matrix_basis - i);
+  };
+  Tandem alg(num_orbitals, num_particles, wave_function);
+  vector<double> two_matrix = alg.run();
+  return log_cholesky_decomp(two_matrix, previous, num_orbitals);
 }
 
 vector<vector<double> > tandem(int num_particles, int num_examples,
@@ -49,6 +72,17 @@ vector<vector<double> > tandem(int num_particles, int num_examples,
     double T = atof(distribution.substr(pos+1).c_str());
     distribution_function = [T](int n)->double { return exp(-n / T); };
   }
+  else if (distribution.substr(0, 9) == "zero_spin"){
+    // Shame on me, assuming 20 orbitals and Ca40...
+    std::cout << "WARNING: zero_spin, distribution is currently hardcoded for a specific Ca40 basis with 20 spin-orbitals." << endl;
+    assert(num_orbitals == 20);  // minimum sanity check
+    vector<double> energies = {-8.6240, -5.6793, -4.1370, -1.3829};
+    vector<int> spins = {7, 3, 1, 5};
+    double T = 10.0;
+    vector<vector<double>> info = pairs(num_orbitals, num_particles, spins, energies);
+    distribution_function = [T, info](int n)->double {
+      return info.at(n).at(0) * exp(-(info.at(n).at(1) - info.at(0).at(1)) / T);};
+  }
   else{
     cout << "Unknown distriution " << optarg << endl;
     cout << "Avaliable: \"uniform\", \"one_over_x\", and \"exponential\"" << endl;
@@ -60,24 +94,8 @@ vector<vector<double> > tandem(int num_particles, int num_examples,
   const int basis_length =
       boost::math::binomial_coefficient<double>(num_orbitals, num_particles);
   vector<double> wave_function(basis_length);
-  // There is a chance that the generated 2-matrix have eigenvalues
-  // that are zero. This does not happen very often but when it
-  // happens the cholesky decomposition will fail. To remedy this, on
-  // those occation we make a convex combination of mostly the actual
-  // 2-matrix but also the previus two matrix. However the first
-  // 2-matrix generated will not have a previoius 2-matrix so we
-  // initiate that to the unit matrix but with trace N(N-1).
   size_t two_matrix_basis = boost::math::binomial_coefficient<double>(num_orbitals, 2);
-  size_t two_matrix_length = boost::math::binomial_coefficient<double>(two_matrix_basis, 2)
-    + two_matrix_basis;
-  vector<double> previous(two_matrix_length, 0);
-  double element = num_particles * (num_particles - 1) / (double) two_matrix_basis;
-  size_t pos = 0;
-  for (size_t i = 0; i < two_matrix_basis; i++) {
-      previous.at(pos) = element;
-      pos = pos + (two_matrix_basis - i);
-  };
-
+  size_t two_matrix_length = boost::math::binomial_coefficient<double>(two_matrix_basis, 2);
   // Create instance to hold all the glorios 2-RDMs
   vector<vector<double> > res(num_examples, vector<double>(two_matrix_length)); 
 
@@ -104,9 +122,7 @@ vector<vector<double> > tandem(int num_particles, int num_examples,
       wave_function.at(j) = wave_function.at(j) / total_sum;
     }
     assert(abs(abs(wave_function) - 1) < 0.001);
-    Tandem alg(num_orbitals, num_particles, wave_function);
-    vector<double> two_matrix = alg.run();
-    res.at(i) = log_cholesky_decomp(two_matrix, previous, num_orbitals);
+    res.at(i) = tandem_on_wf(wave_function, num_particles, num_orbitals);
     // if (i % 100 == 0){
     //   printf("\r%i/%i", (int)i, num_examples);
     //   fflush(stdout);

@@ -1,1 +1,1 @@
-from PyTandem import tandem
+from PyTandem import tandem, tandem_on_wf

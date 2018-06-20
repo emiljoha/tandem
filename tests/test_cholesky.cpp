@@ -14,6 +14,14 @@
 #include "../cholesky.h"
 
 using namespace std;
+void print_matrix(vector<double> m) {
+  cout << "\n";
+  for (size_t i = 0; i < m.size(); i++) {
+    cout << m.at(i) << " ";
+  }
+  cout << "\n";
+}
+
 int main() {
   cout << "Cholesky decomposition test... ";
   // Ground state to N=3, M=4
@@ -38,8 +46,8 @@ int main() {
 			     0, 0, 0, 0, -8.40562,
 			     0, 0, 0, 0, 0, -8.40562};
   for (size_t i = 0; i < 6; i++) {
-    for (size_t j = 0; j <= i; j++){
-      if (abs(expected.at(counter) - res.at(counter)) > 0.001){
+    for (size_t j = 0; j <= i; j++) {
+      if (abs(exp(expected.at(counter)) - exp(res.at(counter))) > 0.001) {
 	cout << "FALIED!\n";
 	return 0;
       }
