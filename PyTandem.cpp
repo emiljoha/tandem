@@ -42,7 +42,7 @@ BOOST_PYTHON_MODULE(PyTandem) //
       "        for specification of how the rank 4 tensor is transformed to a rank 2 matrix.\n"
       "        See Pinheiro(1996) for details on the log-Cholesky decomposition.\n"
       );
-  def("tandem_on_wf", tandem_on_wf,
+  def<vector<double> (vector<double>, int, int)>("tandem_on_wf", tandem_on_wf,
       return_value_policy<return_by_value>(),
       "Get 2RDM of a wave function\n\n"
       "# Arguments:\n"
@@ -51,6 +51,19 @@ BOOST_PYTHON_MODULE(PyTandem) //
       "    num_orbitals (int)\n\n"
       "# Return:\n"
       "    2RDM (list) --- The log-Cholesky decomposition of the 2D matrix representation\n"
+      "        of the full two particle reduced density matrix. See Nakata(2017) page 16\n"
+      "        for specification of how the rank 4 tensor is transformed to a rank 2 matrix.\n"
+      "        See Pinheiro(1996) for details on the log-Cholesky decomposition.\n"
+      );
+  def<vector<vector<double>> (vector<vector<double>>, int, int)>("tandem_on_wf", tandem_on_wf,
+      return_value_policy<return_by_value>(),
+      "Get 2RDM of a list of wave functions\n\n"
+      "# Arguments:\n"
+      "    wave_functions (list) --- The wave functions to be reduced\n"
+      "    num_particles (int)\n"
+      "    num_orbitals (int)\n\n"
+      "# Return:\n"
+      "    2RDM (2D list) --- The log-Cholesky decompositions of the 2D matrix representation\n"
       "        of the full two particle reduced density matrix. See Nakata(2017) page 16\n"
       "        for specification of how the rank 4 tensor is transformed to a rank 2 matrix.\n"
       "        See Pinheiro(1996) for details on the log-Cholesky decomposition.\n"

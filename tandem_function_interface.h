@@ -54,6 +54,17 @@ vector<double> tandem_on_wf(vector<double> wave_function, int num_particles,
   return log_cholesky_decomp(two_matrix, previous, num_orbitals);
 }
 
+vector<vector<double>> tandem_on_wf(vector<vector<double>> wave_functions, int num_particles,
+				    int num_orbitals){
+  size_t two_matrix_basis = boost::math::binomial_coefficient<double>(num_orbitals, 2);
+  size_t two_matrix_length = boost::math::binomial_coefficient<double>(two_matrix_basis, 2)
+    + two_matrix_basis;
+  vector<vector<double>> results(wave_functions.size(), vector<double>(two_matrix_length));
+  for (size_t i = 0; i < wave_functions.size(); i++){
+    results.at(i) = tandem_on_wf(wave_functions.at(i), num_particles, num_orbitals);
+  }
+  return results;
+}
 vector<vector<double> > tandem(int num_particles, int num_examples,
 			       int num_orbitals, string distribution)
 {
