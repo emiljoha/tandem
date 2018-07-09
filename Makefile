@@ -2,8 +2,8 @@ CC=g++
 CFLAGS= -std=c++11 -lgsl -lgslcblas -lm -lboost_system -lboost_filesystem -fPIC
 PYTHON_VERSION = 2.7
 PYTHON_INCLUDE = /usr/include/python$(PYTHON_VERSION)
-OBJ = tandem.o
-DEPS = conversions.h tandem.h cholesky.cpp tandem_function_interface.h pairs.h
+OBJ = tandem.o energy.o
+DEPS = conversions.h tandem.h cholesky.cpp tandem_function_interface.h pairs.h energy.h
 # location of the Boost Python include files and library
 BOOST_INC = /usr/include
 BOOST_LIB = /usr/lib
@@ -12,19 +12,23 @@ TARGET = PyTandem
 PWD=$(pwd)
 # LD_LIBRARY_PATH=$(PWD)
 # The mess known as compiling shared library for python bindings.
-$(TARGET).so: $(TARGET).o $(DEPS) tandem.o
-	g++ -shared -Wl,--export-dynamic,-rpath=$(PWD) $(TARGET).o tandem.o -L$(PWD) -L$(BOOST_LIB) -lboost_python \
--L/usr/lib/python$(PYTHON_VERSION)/config -lpython$(PYTHON_VERSION) -o $(TARGET).so $(CFLAGS) \
-
+$(TARGET).so: $(TARGET).o $(DEPS) $(OBJ)
+	g++ -shared -Wl,--export-dynamic,-rpath=$(PWD) $(TARGET).o $(OBJ) -L$(PWD) -L$(BOOST_LIB) -lboost_python \
+-L/usr/lib/python$(PYTHON_VERSION)/config -lpython$(PYTHON_VERSION) -o $(TARGET).so $(CFLAGS)
 
 $(TARGET).o: $(TARGET).cpp $(DEPS)
 	g++ -I$(PYTHON_INCLUDE) -I$(BOOST_INC) -fPIC -c $(TARGET).cpp $(CFLAGS)
 
-libtandem.so : tandem.o
-	gcc -shared -o libtandem.so tandem.o $(CFLAGS)
+# libtandem.so : tandem.o
+# 	gcc -shared -o libtandem.so tandem.o $(CFLAGS)
+%.so : %.o
+	gcc -shared -o $@ $< $(CFLAGS)
 
-tandem.o: tandem.cpp $(DEPS)
-	g++ -c -o $@ $< $(CFLAGS)
+# tandem.o: tandem.cpp $(DEPS)
+# 	g++ -c -o $@ $< $(CFLAGS)
+
+%.o: %.cpp $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
 
 cli : tandem_cli.cpp tandem_function_interface.h tandem.o
 	$(CC) -I. -c tandem_cli.cpp --std=c++11

@@ -1,4 +1,6 @@
 #include "tandem_function_interface.h"
+#include "hartree_fock.h"
+#include "energy.h"
 #include "conversions.h"
 #include <vector>
 #include <string>
@@ -53,4 +55,25 @@ BOOST_PYTHON_MODULE(PyTandem) //
       "        for specification of how the rank 4 tensor is transformed to a rank 2 matrix.\n"
       "        See Pinheiro(1996) for details on the log-Cholesky decomposition.\n"
       );
+  def("hf_wf_from_D", hf_wf_from_D,
+      return_value_policy<return_by_value>(),
+      "Get wave function from Hartree-Fock matrix D\n\n"
+      "# Arguments:\n"
+      "    D (2D list) --- Hartree-Fock basis change matrix. D[particle_number][orbital_number]\n"
+      "    num_orbitals (int)\n"
+      "    num_particles (int)\n\n"
+      "# Returns:\n"
+      "    wave_function (list)\n"
+      );
+  def("energy", calc_energy,
+      return_value_policy<return_by_value>(),
+      "Get Energy\n\n"
+      "Return energy of wave_function with respect to the hamiltonian\n\n"
+      "# Arguments:\n"
+      "    wave_function (list)\n"
+      "    hamiltonian (list)\n"
+      "    num_particles (int)\n"
+      "    num_orbitals (int)\n\n"
+      "# Return:\n"
+      "    energy (float)\n");
 }
