@@ -16,6 +16,6 @@ int main() {
       boost::math::binomial_coefficient<double>(num_orbitals, num_particles);
   vector<vector<double>> res = tandem(num_particles, num_examples,
 				      num_orbitals, distribution);
-    cout << " PASSED!" << endl;
+  cout << " PASSED!" << endl;
   return 0;
 }

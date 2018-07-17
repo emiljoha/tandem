@@ -21,6 +21,30 @@ struct std_vector_to_python_list
       }
 };
 
+struct std_int_vector_to_python_list
+{
+  static PyObject* convert(vector<int> const& v)
+      {
+	py::list l;
+	for (size_t i = 0; i < v.size(); i++) {
+	  l.append(v.at(i)); // Well this sucks
+	}
+        return py::incref(l.ptr());
+      }
+};
+
+struct std_bool_vector_to_python_list
+{
+  static PyObject* convert(vector<bool> const& v)
+      {
+	py::list l;
+	for (size_t i = 0; i < v.size(); i++) {
+	  l.append(v.at(i)); // Well this sucks
+	}
+        return py::incref(l.ptr());
+      }
+};
+
 struct std_mat_to_python_list
 {
   static PyObject* convert(vector<vector<double>> const& mat)
@@ -75,6 +99,94 @@ struct std_vector_from_python_list
       // in-place construct the new QString using the character data
       // extraced from the python object
       new (storage) vector<double>(value);
+ 
+      // Stash the memory chunk pointer for later use by boost.python
+      data->convertible = storage;
+    }
+};
+
+struct std_int_vector_from_python_list
+{
+  std_int_vector_from_python_list()
+  {
+    // register the vec-to-python converter
+    py::converter::registry::push_back(&convertible,
+						  &construct,
+						  py::type_id<vector<int> >());
+  }
+  
+  // Determine if obj_ptr can be converted in a QString
+  static void* convertible(PyObject* obj_ptr)
+    {
+      if (!PySequence_Check(obj_ptr)) return 0;
+      return obj_ptr;
+    }
+
+  // Convert obj_ptr into a vector<int>
+  static void construct(
+    PyObject* obj_ptr,
+    py::converter::rvalue_from_python_stage1_data* data)
+    {
+      // Extract the double data from the python sequence
+      vector<int> value(PySequence_Length(obj_ptr));
+      for (size_t i = 0; i < value.size(); i++){
+	value.at(i) = PyInt_AsLong(PySequence_GetItem(obj_ptr, i));
+      }
+      // Check if all went well
+      if (PyErr_Occurred()){
+	throw invalid_argument("Cannot convert element to int");
+      }
+      // Grab pointer to memory into which to construct the new vector
+      void* storage = ((py::converter::rvalue_from_python_storage<vector<int> >*)
+		       data)->storage.bytes;
+ 
+      // in-place construct the new QString using the character data
+      // extraced from the python object
+      new (storage) vector<int>(value);
+ 
+      // Stash the memory chunk pointer for later use by boost.python
+      data->convertible = storage;
+    }
+};
+
+struct std_bool_vector_from_python_list
+{
+  std_bool_vector_from_python_list()
+  {
+    // register the vec-to-python converter
+    py::converter::registry::push_back(&convertible,
+						  &construct,
+						  py::type_id<vector<bool> >());
+  }
+  
+  // Determine if obj_ptr can be converted in a QString
+  static void* convertible(PyObject* obj_ptr)
+    {
+      if (!PySequence_Check(obj_ptr)) return 0;
+      return obj_ptr;
+    }
+
+  // Convert obj_ptr into a vector<bool>
+  static void construct(
+    PyObject* obj_ptr,
+    py::converter::rvalue_from_python_stage1_data* data)
+    {
+      // Extract the double data from the python sequence
+      vector<bool> value(PySequence_Length(obj_ptr));
+      for (size_t i = 0; i < value.size(); i++){
+	value.at(i) = PyObject_IsTrue(PySequence_GetItem(obj_ptr, i));
+      }
+      // Check if all went well
+      if (PyErr_Occurred()){
+	throw invalid_argument("Cannot convert element to bool");
+      }
+      // Grab pointer to memory into which to construct the new vector
+      void* storage = ((py::converter::rvalue_from_python_storage<vector<bool> >*)
+		       data)->storage.bytes;
+ 
+      // in-place construct the new QString using the character data
+      // extraced from the python object
+      new (storage) vector<bool>(value);
  
       // Stash the memory chunk pointer for later use by boost.python
       data->convertible = storage;

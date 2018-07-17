@@ -69,9 +69,9 @@ vector<vector<double> > tandem(int num_particles, int num_examples,
 			       int num_orbitals, string distribution)
 {
   std::function<double(int)> distribution_function;
-  // Create distribution function from string. 
+  // Create distribution function from string.
   if (distribution == "uniform"){
-    distribution_function = [](int n)->double {return 1;}; 
+    distribution_function = [](int n)->double {return 1;};
   }
   else if (distribution.substr(0, 10) == "one_over_x"){
     int pos = distribution.find("-");
@@ -87,12 +87,19 @@ vector<vector<double> > tandem(int num_particles, int num_examples,
     // Shame on me, assuming 20 orbitals and Ca40...
     std::cout << "WARNING: zero_spin, distribution is currently hardcoded for a specific Ca40 basis with 20 spin-orbitals." << endl;
     assert(num_orbitals == 20);  // minimum sanity check
-    vector<double> energies = {-8.6240, -5.6793, -4.1370, -1.3829};
-    vector<int> spins = {7, 3, 1, 5};
+    vector<double> energies = {-8.6240, -8.6240, -8.6240, -8.6240, -8.6240, -8.6240, -8.6240, -8.6240,
+			       -5.6793, -5.6793, -5.6793, -5.6793,
+			       -4.1370, -4.1370,
+			       -1.3829, -1.3829, -1.3829, -1.3829, -1.3829, -1.3829};
+    vector<double> N_basis_energies = basis_energies(num_orbitals, num_particles, energies);
+    vector<int> spins = {-7, -5, -3, -1, 1, 3, 5, 7,
+			 -3, -1, 1, 3,
+			 -1, 1,
+			 -5, -3, -1, 1, 3, 5};
+    vector<bool> is_spin_zero_list = is_spin_zero(num_orbitals, num_particles, spins);
     double T = 10.0;
-    vector<vector<double>> info = pairs(num_orbitals, num_particles, spins, energies);
-    distribution_function = [T, info](int n)->double {
-      return info.at(n).at(0) * exp(-(info.at(n).at(1) - info.at(0).at(1)) / T);};
+    distribution_function = [T, is_spin_zero_list, N_basis_energies](int n)->double {
+      return is_spin_zero_list.at(n) * exp(-(N_basis_energies.at(n) - N_basis_energies.at(0)) / T);};
   }
   else{
     cout << "Unknown distriution " << optarg << endl;

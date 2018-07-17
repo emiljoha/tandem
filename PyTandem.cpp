@@ -1,5 +1,6 @@
 #include "tandem_function_interface.h"
 #include "hartree_fock.h"
+#include "pairs.h"
 #include "energy.h"
 #include "conversions.h"
 #include <vector>
@@ -10,16 +11,24 @@ using namespace boost::python;
 BOOST_PYTHON_MODULE(PyTandem) // 
 {
   docstring_options local_docstring_options(true, true, false);
-  // register the vec-to-python converter
+  // register the vec-to-python converters
   to_python_converter<
     vector<double>,
     std_vector_to_python_list>();
+  to_python_converter<
+    vector<int>,
+    std_int_vector_to_python_list>();
+  to_python_converter<
+    vector<bool>,
+    std_bool_vector_to_python_list>();
   // register the mat-to-python converter
   to_python_converter<
     vector<vector<double> >,
     std_mat_to_python_list>();
-  // register python to vec
+  // register python to vecs
   std_vector_from_python_list();
+  std_int_vector_from_python_list();
+  std_bool_vector_from_python_list();
   // Register python to mat
   std_mat_from_python_list();
   def("tandem", tandem,
@@ -89,4 +98,33 @@ BOOST_PYTHON_MODULE(PyTandem) //
       "    num_orbitals (int)\n\n"
       "# Return:\n"
       "    energy (float)\n");
+  def("spin", calc_energy,
+      return_value_policy<return_by_value>(),
+      "Get Energy\n\n"
+      "Return energy of wave_function with respect to the hamiltonian\n\n"
+      "# Arguments:\n"
+      "    wave_function (list)\n"
+      "    hamiltonian (list)\n"
+      "    num_particles (int)\n"
+      "    num_orbitals (int)\n\n"
+      "# Return:\n"
+      "    energy (float)\n");
+    def("is_spin_zero", is_spin_zero,
+      return_value_policy<return_by_value>(),
+      "Get list bool wheather each basis state has spin == 0\n\n"
+      "# Arguments:\n"
+      "    num_orbitals (int)\n\n"
+      "    num_particles (int)\n"
+      "    one_basis_spins (list) Spin of each one partical orbital basis.\n"
+      "# Return:\n"
+      "    List of booleans weather each basis has spin == 0 or not.\n");
+    def("basis_energies", basis_energies,
+      return_value_policy<return_by_value>(),
+      "Get list energies of basis states assuming no interaction\n\n"
+      "# Arguments:\n"
+      "    num_orbitals (int)\n\n"
+      "    num_particles (int)\n"
+      "    one_basis_energies (list) Spin of each one partical orbital basis.\n"
+      "# Return:\n"
+      "    List of energies\n");
 }
