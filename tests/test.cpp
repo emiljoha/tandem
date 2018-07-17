@@ -60,16 +60,14 @@ vector<vector<double> > Test::one_rdm() {
   if (not expanded) {
     expand();
   }
-  if (not one_matrix_generated) {
-    for (size_t i = 0; i < num_orbitals; i++) {
-      for (size_t j = 0; j < num_orbitals; j++) {
-	for (size_t k = 0; k < num_orbitals; k++) {
-	  one_matrix.at(i).at(j) += two_rdm[i][k][j][k] / (num_particles - 1);
-	}
+  for (size_t i = 0; i < num_orbitals; i++) {
+    for (size_t j = 0; j < num_orbitals; j++) {
+      for (size_t k = 0; k < num_orbitals; k++) {
+	one_matrix.at(i).at(j) += two_rdm[i][k][j][k] / (num_particles - 1);
       }
     }
-    one_matrix_generated = true;
   }
+  one_matrix_generated = true;
   return one_matrix;
 }
 
