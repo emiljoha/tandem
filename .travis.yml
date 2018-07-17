@@ -10,10 +10,10 @@ python:
 install:
   - sudo apt-get install libboost-all-dev libgsl0-dev
   - make
-  - make -C tests zero_spin.out
+  - make -C tests
   - pip install -r requirements.txt
   - export PYTHONPATH=$PWD
 # command to run tests
 script:
   - pytest
-  - ./tests/zero_spin.out
+  - make -C tests run
