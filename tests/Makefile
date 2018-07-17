@@ -9,6 +9,8 @@ TESTS = two_way_test.out energy_test.out test_case_0.out test_case_2.out test_ca
 random_test_cases.out test_cholesky.out	timer.out zero_spin.out
 
 all: $(TESTS) HF.wf one_mat.m
+
+run: $(TESTS) HF.wf one_mat.m
 	./two_way_test.out
 	./energy_test.out
 	./test_case_0.out
