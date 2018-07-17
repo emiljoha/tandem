@@ -8,8 +8,8 @@
 
 using namespace std;
 
-bool test_zero_spin_tandem() {
-  // Basic info
+BOOST_AUTO_TEST_CASE( zero_spin_test )
+{
   const int num_orbitals = 20;
   const int num_particles = 4;
   const int num_examples = 1;
@@ -18,10 +18,5 @@ bool test_zero_spin_tandem() {
       boost::math::binomial_coefficient<double>(num_orbitals, num_particles);
   vector<vector<double>> res = tandem(num_particles, num_examples,
 				      num_orbitals, distribution);
-  return true;
-}
-
-BOOST_AUTO_TEST_CASE( zero_spin_test )
-{
-  BOOST_CHECK(test_zero_spin_tandem());
+  BOOST_CHECK(true);  // Very basic test: if it did not crash and burn we are happy!
 }
