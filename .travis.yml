@@ -16,4 +16,4 @@ install:
 # command to run tests
 script:
   - pytest
-  - zero_spin.out
+  - ./tests/zero_spin.out
