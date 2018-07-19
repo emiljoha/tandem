@@ -22,6 +22,9 @@
 #include <random>
 #include <string>
 #include <vector>
+#define BOOST_TEST_DYN_LINK        // this is optional
+#define BOOST_TEST_MODULE TwoWayTest
+#include <boost/test/included/unit_test.hpp>  // include this to get main()
 
 using namespace std;
 
@@ -35,8 +38,8 @@ double abs(vector<double> vec) {
   return sqrt(res);
 }
 
-int main() {
-  cout << "two way test...";
+BOOST_AUTO_TEST_CASE( hartree_fock_test )
+{
   // Basic system info
   const int num_orbitals = 10;
   const int num_particles = 4;
@@ -90,15 +93,9 @@ int main() {
     vector<vector<double>> one_matrix = test.one_rdm();
     for (size_t j = 0; j < num_orbitals; j++) {
       for (size_t k = 0; k < num_orbitals; k++) {
-        if (abs(one_matrix.at(j).at(k) - one_matrix_from_file.at(j).at(k)) >
-            0.0001) {
-          // test failed
-          cout << "ERROR: two way test: matrices does not match!" << endl;
-          return 0;
-        }
+        BOOST_REQUIRE(abs(one_matrix.at(j).at(k) - one_matrix_from_file.at(j).at(k)) <
+		      0.0001);
       }
     }
   }
-  cout << " PASSED! " << endl;
-  return 0;
 }

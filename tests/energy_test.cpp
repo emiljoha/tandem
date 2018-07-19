@@ -19,6 +19,9 @@
 #include <random>
 #include <string>
 #include <vector>
+#define BOOST_TEST_DYN_LINK        // this is optional
+#define BOOST_TEST_MODULE EnergyTest
+#include <boost/test/included/unit_test.hpp>  // include this to get main()
 
 using namespace std;
 
@@ -30,8 +33,8 @@ double abs(vector<double> vec) {
   return sqrt(res);
 }
 
-int main() {
-  cout << "energy test... ";
+BOOST_AUTO_TEST_CASE( hartree_fock_test )
+{
   // Basic info
   const int num_orbitals = 10;      // Dependent on hamiltonians!
   const int num_particles = 4;      // Dependent on hamiltonians!
@@ -48,11 +51,8 @@ int main() {
   ifstream file_hamiltonians(file_name_hamiltonians, ios_base::in);
   // Check if file opended succesfully
   if (!file_hamiltonians) {
-    cout << "ERROR: energy test: " << file_name_hamiltonians
-         << " did not open succesfully" << endl;
-    return -1;
+    BOOST_FAIL("ERROR: energy test:" + file_name_hamiltonians + "did not open succesfully");
   }
-
   int counter = 0;
   vector<double> energy(num_hamiltonians), interaction(num_hamiltonians);
   for (std::string line;

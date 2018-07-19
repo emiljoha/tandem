@@ -19,8 +19,8 @@ BOOST_AUTO_TEST_CASE( hartree_fock_test )
   D.at(0).at(2) = 1 / sqrt(4); D.at(1).at(2) = 1 / sqrt(4);
   vector<double> result = hf_wf_from_D(D, num_orbitals, num_particles);
   vector<double> expected_result = {1 / sqrt(2), 1 / sqrt(2), 0};
-  BOOST_CHECK(result.size() == expected_result.size());
+  BOOST_REQUIRE(result.size() == expected_result.size());
   for (size_t i = 0; i < result.size(); i++){
-    BOOST_CHECK(abs(result.at(i) - expected_result.at(i)) < 1e-2);
+    BOOST_REQUIRE(abs(result.at(i) - expected_result.at(i)) < 1e-2);
   }
 }
