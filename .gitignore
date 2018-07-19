@@ -1,0 +1,9 @@
+*.out
+*.o
+__pycache__
+*cache*
+*~
+HF.wf
+one_mat.m
+# This is really weired. I have no idea why/where an extra copy if this file is created when running tests.
+two_matrix_2.txt
