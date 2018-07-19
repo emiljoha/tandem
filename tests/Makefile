@@ -7,7 +7,7 @@ OBJ = tandem.o test.o
 LINKFLAGS= -lgsl -lgslcblas -lm -lboost_filesystem -lboost_system
 # TESTS = zero_spin.out timer.out
 TESTS = zero_spin.out hf_test.out two_way_test.out energy_test.out tandem_test.out hf_energy_test.out \
-	random_test_cases.out test_cholesky.out
+	random_test_cases.out test_cholesky.out timer.out
 
 all: $(TESTS) HF.wf one_mat.m
 
@@ -20,7 +20,7 @@ run: $(TESTS) HF.wf one_mat.m
 	./hf_energy_test.out
 	./random_test_cases.out
 	./test_cholesky.out
-# ./timer.out -p 4 -e 100 -f test.cho -d uniform
+	./timer.out
 
 %.out: %.o $(OBJ)
 	g++ -o $@ $^ $(LINKFLAGS)
