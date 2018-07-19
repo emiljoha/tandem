@@ -12,6 +12,9 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/linear_congruential.hpp> // not sure if needed
 #include "../cholesky.h"
+#define BOOST_TEST_DYN_LINK        // this is optional
+#define BOOST_TEST_MODULE CholeskyDecompTest
+#include <boost/test/included/unit_test.hpp>  // include this to get main()
 
 using namespace std;
 void print_matrix(vector<double> m) {
@@ -22,8 +25,8 @@ void print_matrix(vector<double> m) {
   cout << "\n";
 }
 
-int main() {
-  cout << "Cholesky decomposition test... ";
+BOOST_AUTO_TEST_CASE( cholesky_decomp_test )
+{
   // Ground state to N=3, M=4
   vector<double> two_matrix = {1, 0, 0, 0, 0, 0,
 			         1, 0, 0, 0, 0,
@@ -49,11 +52,9 @@ int main() {
     for (size_t j = 0; j <= i; j++) {
       if (abs(exp(expected.at(counter)) - exp(res.at(counter))) > 0.001) {
 	cout << "FALIED!\n";
-	return 0;
+	BOOST_REQUIRE(false);
       }
       counter++;
     }
   }
-  cout << "PASSED!\n";
-  return 0;
 }

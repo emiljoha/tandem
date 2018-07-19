@@ -5,9 +5,9 @@ CFLAGS=-I. -std=c++11 -g
 DEPS=../*.h
 OBJ = tandem.o test.o
 LINKFLAGS= -lgsl -lgslcblas -lm -lboost_filesystem -lboost_system
-# TESTS = test_cholesky.out	timer.out zero_spin.out
+# TESTS = zero_spin.out timer.out
 TESTS = zero_spin.out hf_test.out two_way_test.out energy_test.out tandem_test.out hf_energy_test.out \
-	random_test_cases.out
+	random_test_cases.out test_cholesky.out
 
 all: $(TESTS) HF.wf one_mat.m
 
@@ -19,8 +19,8 @@ run: $(TESTS) HF.wf one_mat.m
 	./tandem_test.out
 	./hf_energy_test.out
 	./random_test_cases.out
-# ./test_cholesky.out
-# ./timer.out -p 4 -e 200 -f test.cho -d uniform
+	./test_cholesky.out
+# ./timer.out -p 4 -e 100 -f test.cho -d uniform
 
 %.out: %.o $(OBJ)
 	g++ -o $@ $^ $(LINKFLAGS)
