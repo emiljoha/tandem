@@ -131,16 +131,16 @@ def Energy(D, H):
 def D_to_2rdm(D_file_name, two_matrix_file_name, I):
     D = np.loadtxt(D_file_name)
     two_rdm = np.loadtxt(two_matrix_file_name)
-    H = HamiltonianBucket(['H_ca_20_edges'], 4, 'CA', [I]).get_all()
+    H = HamiltonianBucket(['tests/data/H_ca_20_edges'], 4, 'CA', [I]).get_all()
     E = Energy(D, H)
     E2 = [np.sum(h*two_rdm) for h in H]
     assert(abs(E[0] - E2[0]) < 0.1)
 
 
 def test_hartree_fock_conversion():
-    for D, twordm, I in [('ca_0_D.txt', 'two_matrix_0.txt', 0), ('ca_0.5_D.txt', 'two_matrix_1.txt', 0.5),
-                      ('ca_1_D.txt', 'two_matrix_2.txt', 1), ('ca_1.5_D.txt', 'two_matrix_3.txt', 1.5),
-                      ('ca_2_D.txt', 'two_matrix_4.txt', 2)]:
+    for D, twordm, I in [('tests/data/ca_0_D.txt', 'tests/data/two_matrix_0.txt', 0),
+                         ('tests/data/ca_0.5_D.txt', 'tests/data/two_matrix_1.txt', 0.5),
+                         ('tests/data/ca_1_D.txt', 'tests/data/two_matrix_2.txt', 1),
+                         ('tests/data/ca_1.5_D.txt', 'tests/data/two_matrix_3.txt', 1.5),
+                         ('tests/data/ca_2_D.txt', 'tests/data/two_matrix_4.txt', 2)]:
         D_to_2rdm(D, twordm, I)
-    # for D_file_name in ['ca_0_D.txt', 'ca_0.5_D.txt', 'ca_1_D.txt', 'ca_1.5_D.txt', 'ca_2_D.txt']:
-    #     print D_file_to_wf_file(D_file_name)
