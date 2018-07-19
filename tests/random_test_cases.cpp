@@ -13,6 +13,10 @@
 //#include <sstream>
 #include <fstream>
 #include <string>
+#define BOOST_TEST_DYN_LINK        // this is optional
+#define BOOST_TEST_MODULE EnergyTest
+#include <boost/test/included/unit_test.hpp>  // include this to get main()
+
 using namespace std;
 typedef boost::numeric::ublas::matrix<double> boost_matrix;
 double abs(vector<double> vec) {
@@ -22,8 +26,8 @@ double abs(vector<double> vec) {
   }
   return sqrt(res);
 }
-int main() {
-  cout << "random test cases... ";
+BOOST_AUTO_TEST_CASE( energy_test )
+{
   const int num_orbitals = 10;
   const int num_particles = 4;
   const int basis_length =
@@ -38,8 +42,8 @@ int main() {
   vector<vector<double>> expected_two_matrix(num_examples,
                                             vector<double>(dmat_length, 0));
   // Set up files to save to
-  const string file_name_wf = "random_test_cases_wavefunction.dat";
-  const string file_name_dmat = "random_test_cases_matrices.dat";
+  const string file_name_wf = "data/random_test_cases_wavefunction.dat";
+  const string file_name_dmat = "data/random_test_cases_matrices.dat";
   ifstream file_wf(file_name_wf);
   ifstream file_dmat(file_name_dmat);
   // Assert that the files opend succesfully.
@@ -88,10 +92,8 @@ int main() {
         cout << "ERROR! " << endl;
         cout << "Expected: " << expected_two_matrix.at(i).at(j) << endl;
         cout << "GOT: " << two_matrix.at(j) << endl;
-        return 0;
+	BOOST_REQUIRE(false);
       }
     }
   }
-  cout << "PASSED!" << endl;
-  return 0;
 }
