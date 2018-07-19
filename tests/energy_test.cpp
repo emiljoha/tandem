@@ -33,8 +33,7 @@ double abs(vector<double> vec) {
   return sqrt(res);
 }
 
-BOOST_AUTO_TEST_CASE( hartree_fock_test )
-{
+BOOST_AUTO_TEST_CASE( energy_test ) {
   // Basic info
   const int num_orbitals = 10;      // Dependent on hamiltonians!
   const int num_particles = 4;      // Dependent on hamiltonians!
@@ -51,8 +50,11 @@ BOOST_AUTO_TEST_CASE( hartree_fock_test )
   ifstream file_hamiltonians(file_name_hamiltonians, ios_base::in);
   // Check if file opended succesfully
   if (!file_hamiltonians) {
-    BOOST_FAIL("ERROR: energy test:" + file_name_hamiltonians + "did not open succesfully");
+    cout << "ERROR: energy test: " << file_name_hamiltonians
+         << " did not open succesfully" << endl;
+    BOOST_REQUIRE(false);
   }
+
   int counter = 0;
   vector<double> energy(num_hamiltonians), interaction(num_hamiltonians);
   for (std::string line;
@@ -98,11 +100,7 @@ BOOST_AUTO_TEST_CASE( hartree_fock_test )
     Test test(alg);
     for (size_t j = 0; j < num_hamiltonians; j++) {
       double E = test.energy(hamiltonians[j]);
-      if (energy.at(j) > E) {
-        cout << "ERROR: energy test FAILED!" << endl;
-      }
+      BOOST_REQUIRE(energy.at(j) <= E);
     }
   }
-  cout << " PASSED!" << endl;
-  return 0;
 }
