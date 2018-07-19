@@ -82,12 +82,16 @@ def next_permutation(a):
 
 def D_file_to_wf_file(D_file_name):
     D = np.loadtxt(D_file_name)
-    import pdb; pdb.set_trace()
     D = np.transpose(D)
     wf = wf_from_D(D)
     wf_file_name = '%s_wf_py_%s' % (D_file_name[:-6], D_file_name[-5:])
     np.savetxt(wf_file_name, wf, newline=' ')
     return wf_file_name
+
+if __name__ == '__main__':
+    for D_file_name in ['../data/ca_0_D.txt', '../data/ca_0.5_D.txt',
+                        '../data/ca_1_D.txt', '../data/ca_1.5_D.txt', '../data/ca_2_D.txt']:
+        D_file_to_wf_file(D_file_name)
 
 class HamiltonianBucket:
     def __init__(self, hamiltonian_names, num_particles, interaction_scaling, Interaction):
