@@ -98,17 +98,6 @@ BOOST_PYTHON_MODULE(PyTandem) //
       "    num_orbitals (int)\n\n"
       "# Return:\n"
       "    energy (float)\n");
-  def("spin", calc_energy,
-      return_value_policy<return_by_value>(),
-      "Get Energy\n\n"
-      "Return energy of wave_function with respect to the hamiltonian\n\n"
-      "# Arguments:\n"
-      "    wave_function (list)\n"
-      "    hamiltonian (list)\n"
-      "    num_particles (int)\n"
-      "    num_orbitals (int)\n\n"
-      "# Return:\n"
-      "    energy (float)\n");
     def("is_spin_zero", is_spin_zero,
       return_value_policy<return_by_value>(),
       "Get list bool wheather each basis state has spin == 0\n\n"
