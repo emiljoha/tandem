@@ -24,11 +24,12 @@ def generate_and_save_to_cloud(args):
     # print(name)
     gc.collect()
 
+def wf_variance_is_wf_times_temp(wave_function, temperature):
+    return np.abs(wave_function) * temperature
+
 def sample_around_HF_wf(wave_function, temperature, num_examples):
-    wave_function = np.array(wave_function)
-    sampled_wf = \
-        np.random.normal(wave_function,
-                        np.array([(np.abs(wave_function) * temperature).tolist()] * num_examples))
+    wf_variance = wf_variance_is_wf_times_temp(wave_function, temperature)
+    sampled_wf = np.random.normal(wave_function, wf_variance, (num_examples, len(wave_function)))
     normalized_wf = sampled_wf / np.reshape(np.linalg.norm(sampled_wf, axis=1), (len(sampled_wf), 1))
     return normalized_wf
 
