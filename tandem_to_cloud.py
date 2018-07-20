@@ -88,17 +88,23 @@ def HF_generation(batch_size=10, num_files=10, num_orbitals=20,
                   num_cpus=2, D_files=[('../data/CA/HF/ca_1_D.txt', 4)], temperatures=[0.1]):
     arguments = []
     for D_file_name, num_particles in D_files:
-        arguments.append({'D_file_name': D_file_name,
-                          'temperatures': temperatures,
-                          'num_files': num_files,
-                          'batch_size': batch_size,
-                          'num_particles': num_particles,
-                          'num_orbitals': num_orbitals,
-                          'num_cpus': num_cpus})
-    
-    for args in arguments:
-        HF_generate_and_save_to_cloud_from_D(args)
-
+        assert(len(temperatures))
+        D = np.transpose(np.loadtxt(D_file_name))
+        wave_function = pt.hf_wf_from_D(D, num_orbitals, num_particles)
+        for T in temperatures:
+            for i in range(num_files):
+                arguments.append(
+                    {'wave_function': wave_function,
+                     'temperature': T,
+                     'num_particles': num_particles,
+                     'num_orbitals': num_orbitals,
+                     'num_examples': batch_size,
+                     'i': i})
+    pool = Pool(num_cpus)
+    for res in tqdm.tqdm(pool.imap_unordered(HF_generate_and_save_to_cloud_from_wf,
+                                             arguments), total=len(arguments)):
+        if res is not None:
+            print res.get()
 
 def tandem_generation():
     arguments = []
