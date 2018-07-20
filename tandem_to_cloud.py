@@ -23,6 +23,15 @@ def generate_and_save_to_cloud(args):
     # print(name)
     gc.collect()
 
+def sample_around_HF_wf(wave_function, temperature, num_examples):
+    wave_function = np.array(wave_function)
+    sampled_wf = \
+        np.random.normal(wave_function,
+                        np.array([(np.abs(wave_function) * temperature).tolist()] * num_examples))
+    normalized_wf = sampled_wf / np.reshape(np.linalg.norm(sampled_wf, axis=1), (len(sampled_wf), 1))
+    return normalized_wf
+
+
 def HF_generate_and_save_to_cloud_from_wf(args):
     wave_function = args['wave_function']
     temperature = args['temperature']
@@ -37,13 +46,8 @@ def HF_generate_and_save_to_cloud_from_wf(args):
     if already_exists(cloud_path, bucket_name='tandem_10'):
         # print '%s already exists' % name
         return None
-    wave_function = np.array(wave_function)
-    np.random.seed(abs(hash(name)) % 2**32 - 1)
-    sampled_wf = \
-        np.random.normal(wave_function,
-                        np.array([(np.abs(wave_function) * temperature).tolist()] * num_examples))
-    normalized_wf =  sampled_wf / np.reshape(np.linalg.norm(sampled_wf, axis=1), (len(sampled_wf), 1))
-    data = pt.tandem_on_wf(normalized_wf, num_particles, num_orbitals)
+    wf_around_hf = sample_around_HF_wf(wave_function, temperature, num_examples)
+    data = pt.tandem_on_wf(wf_around_hf, num_particles, num_orbitals)
     upload(data, cloud_path, bucket_name='tandem_10')
     del data
     del normalized_wf
