@@ -35,6 +35,10 @@ timer.out : timer.cpp ../tandem.h
 	$(CC) -I. -c timer.cpp --std=c++11 -g
 	$(CC) -o timer.out timer.o -lgsl -lgslcblas -lm -lboost_filesystem -lboost_system tandem.o
 
+test_npy_to_cloud: ../npy_to_cloud.py python_tests/npy_to_cloud_test.py
+	python python_tests/npy_to_cloud_test.py
+	gsutil rm gs://tandem_10/test_data.npy
+
 clean:
 	rm HF.wf one_mat.m
 	rm *.out
