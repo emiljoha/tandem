@@ -24,30 +24,31 @@ def generate_and_save_to_cloud(args):
     gc.collect()
 
 def HF_generate_and_save_to_cloud_from_wf(args):
-    try:
-        wave_function = args['wave_function']
-        temperature = args['temperature']
-        num_particles = args['num_particles']
-        num_orbitals = args['num_orbitals']
-        num_examples = args['num_examples']
-        i = args['i']
-        wf_hash = str(hash(tuple(wave_function)))[:5]
-        name = 'HF-%s_%s_%s_%s_%s_%s.cho.npy' % (temperature, wf_hash, num_particles,
-                                           num_orbitals, num_examples, i)
-        cloud_path = 'data/%s/%s' % (num_orbitals, name)
-        if already_exists(cloud_path, bucket_name='tandem_10'):
-            print '%s already exists' % name
-            return None
-        wave_function = np.array(wave_function)
-        data = np.random.normal(wave_function,
-                                np.array([(wave_function * temperature).tolist()] * num_examples))
-        gc.collect()
-        upload(data, cloud_path, bucket_name='tandem_10')
-        # print(name)
-        gc.collect()
-    except Exception as e:
-        print(str(e))
-        raise e
+    wave_function = args['wave_function']
+    temperature = args['temperature']
+    num_particles = args['num_particles']
+    num_orbitals = args['num_orbitals']
+    num_examples = args['num_examples']
+    i = args['i']
+    wf_hash = str(hash(tuple(wave_function)))[:5]
+    name = 'HF-%s_%s_%s_%s_%s_%s.cho.npy' % (temperature, wf_hash, num_particles,
+                                       num_orbitals, num_examples, i)
+    cloud_path = 'data/%s/%s' % (num_orbitals, name)
+    if already_exists(cloud_path, bucket_name='tandem_10'):
+        # print '%s already exists' % name
+        return None
+    wave_function = np.array(wave_function)
+    np.random.seed(abs(hash(name)) % 2**32 - 1)
+    sampled_wf = \
+        np.random.normal(wave_function,
+                        np.array([(np.abs(wave_function) * temperature).tolist()] * num_examples))
+    normalized_wf =  sampled_wf / np.reshape(np.linalg.norm(sampled_wf, axis=1), (len(sampled_wf), 1))
+    data = pt.tandem_on_wf(normalized_wf, num_particles, num_orbitals)
+    upload(data, cloud_path, bucket_name='tandem_10')
+    del data
+    del normalized_wf
+    del wave_function
+    gc.collect()
 
 
 def HF_generate_and_save_to_cloud_from_D(args):
@@ -61,22 +62,24 @@ def HF_generate_and_save_to_cloud_from_D(args):
     assert(len(temperatures))
     D = np.transpose(np.loadtxt(D_file_name))
     wave_function = pt.hf_wf_from_D(D, num_orbitals, num_particles)
-    next_level_arguments = []
+    arguments = []
     for T in temperatures:
         for i in range(num_files):
-            next_level_arguments.append(
+            arguments.append(
                 {'wave_function': wave_function,
                  'temperature': T,
                  'num_particles': num_particles,
                  'num_orbitals': num_orbitals,
                  'num_examples': batch_size,
                  'i': i})
+    # HF_generate_and_save_to_cloud_from_wf(arguments[0])
     pool = Pool(num_cpus)
-    for res in pool.imap_unordered(HF_generate_and_save_to_cloud_from_wf,
-                                   next_level_arguments):
-        print res.get()
+    for res in tqdm.tqdm(pool.imap_unordered(HF_generate_and_save_to_cloud_from_wf,
+                                             arguments), total=len(arguments)):
+        if res is not None:
+            print res.get()
 
-def HF_generation(batch_size=10, num_files=10, num_orbitals=20, num_examples=10,
+def HF_generation(batch_size=10, num_files=10, num_orbitals=20,
                   num_cpus=2, D_files=[('../data/CA/HF/ca_1_D.txt', 4)], temperatures=[0.1]):
     arguments = []
     for D_file_name, num_particles in D_files:
@@ -86,7 +89,6 @@ def HF_generation(batch_size=10, num_files=10, num_orbitals=20, num_examples=10,
                           'batch_size': batch_size,
                           'num_particles': num_particles,
                           'num_orbitals': num_orbitals,
-                          'num_examples': num_examples,
                           'num_cpus': num_cpus})
     
     for args in arguments:
@@ -95,7 +97,7 @@ def HF_generation(batch_size=10, num_files=10, num_orbitals=20, num_examples=10,
 
 def tandem_generation():
     arguments = []
-    pool = Pool(2)
+    pool = Pool(16)
     for distribution in ['zero_spin']:
         for num_particles in [4]:
             for i in range(10):
@@ -110,5 +112,9 @@ def tandem_generation():
 
 
 if __name__ == '__main__':
-    HF_generation(batch_size=10, num_files=10, num_orbitals=20, num_examples=10,
-                  num_cpus=2, D_files=[('../data/CA/HF/ca_1_D.txt', 4)], temperatures=[0.1])
+    HF_generation(batch_size=10, num_files=1000, num_orbitals=20,
+                  num_cpus=64, D_files=[('../data/CA/HF/ca_0_D.txt', 4),
+                                        ('../data/CA/HF/ca_0.5_D.txt', 4),
+                                        ('../data/CA/HF/ca_1.5_D.txt', 4),
+                                        ('../data/CA/HF/ca_2_D.txt', 4)],
+                  temperatures=[0.1])
