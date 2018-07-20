@@ -1,4 +1,5 @@
 from multiprocessing import Pool
+from npy_to_cloud import upload, already_exists
 import numpy as np
 import time
 import PyTandem as pt
@@ -50,7 +51,6 @@ def HF_generate_and_save_to_cloud_from_wf(args):
     data = pt.tandem_on_wf(wf_around_hf, num_particles, num_orbitals)
     upload(data, cloud_path, bucket_name='tandem_10')
     del data
-    del normalized_wf
     del wave_function
     gc.collect()
 
