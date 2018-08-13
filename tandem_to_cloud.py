@@ -53,7 +53,6 @@ def HF_generate_and_save_to_cloud_from_wf(args):
     wf_hash = str(hash(tuple(wave_function)))[:5]
     name = 'HF-ES-%s_%s_%s_%s_%s_%s.cho.npy' % (temperature, wf_hash, num_particles,
                                              num_orbitals, num_examples, i)
-    print name
     cloud_path = 'data/%s/%s' % (num_orbitals, name)
     if already_exists(cloud_path, bucket_name='tandem_10'):
         # print '%s already exists' % name
@@ -94,11 +93,11 @@ def HF_generation(batch_size=10, num_files=10, num_orbitals=20,
                      'one_basis_spins': one_basis_spins,
                      'one_basis_energies': one_basis_energies})
     pool = Pool(num_cpus)
-    HF_generate_and_save_to_cloud_from_wf(arguments[0])
-    # for res in tqdm.tqdm(pool.imap_unordered(HF_generate_and_save_to_cloud_from_wf,
-    #                                          arguments), total=len(arguments)):
-    #     if res is not None:
-    #         print res.get()
+    # HF_generate_and_save_to_cloud_from_wf(arguments[0])
+    for res in tqdm.tqdm(pool.imap_unordered(HF_generate_and_save_to_cloud_from_wf,
+                                             arguments), total=len(arguments)):
+        if res is not None:
+            print res.get()
 
 def tandem_generation():
     arguments = []
@@ -115,17 +114,16 @@ def tandem_generation():
         arguments = []
         print(distribution)
 
-
 if __name__ == '__main__':
-    import cProfile
     HF_generation(batch_size=2, num_files=2, num_orbitals=20,
-                  num_cpus=2, D_files=[('../data/CA/HF/ca_1_D.txt', 4)],
+                  num_cpus=2, D_files=[('../data/CA/HF/ca_1_D.txt', 4),
+                                       ('../data/CA/HF/ca_0.5_D.txt', 4),
+                                        ('../data/CA/HF/ca_1.5_D.txt', 4),
+                                        ('../data/CA/HF/ca_2_D.txt', 4)],
                   temperatures=[0.1], one_basis_spins=[-7, -5, -3, -1, 1, 3, 5, 7,
                                                        -3, -1, 1, 3, -1, 1, -5, -3, -1, 1, 3, 5],
                   one_basis_energies=[-8.6240, -8.6240, -8.6240, -8.6240, -8.6240,
                                       -8.6240, -8.6240, -8.6240, -5.6793, -5.6793, -5.6793, -5.6793,
                                       -4.1370, -4.1370, -1.3829, -1.3829, -1.3829, -1.3829, -1.3829,
                                       -1.3829])
-                                        # ('../data/CA/HF/ca_0.5_D.txt', 4),
-                                        # ('../data/CA/HF/ca_1.5_D.txt', 4),
-                                        # ('../data/CA/HF/ca_2_D.txt', 4)]
+
