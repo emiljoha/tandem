@@ -1,10 +1,38 @@
-# TANDEM - TrAce N DEnsity Matrices
+Welcome TANDEM - TrAce N DEnsity Matrices
 
-Reduces N-particle wave functions to 2-particle density matrices.
+This module is all about generating examples to train on. Many
+different ways to generate. Tandem is also probably the best
+maintained package between (annan, scripts and data) as it is most
+likley not to be completley irrelevant.
 
-USAGE: tandem -p number_of_particles -e number_of_examples -f file_to_save_to -d distribution
+The python bindings, documented in PyTandem.cpp are the most usefull
+and expose allmost all of the packages functionality. The rest is
+legacy code and tests.
 
-Implemented distributions are uniform, one_over_x-p and exponential-T
-where p and T can be any number specifying 1/x^p and exp(-x/T) respectivly.
+To make it easier to maintain and make changes this module has a
+.travis.yml file that facilitates automatic unittesting when commiting
+to a travis enable git repository.
 
-The library is dependent on BOOST and possibly it needs c++11.
+# Installation:
+
+Create a python2 virtual enviroment and activate it then do:
+
+  - pip install -r requirements.txt
+  - export PYTHONPATH=$PWD
+  - sudo apt-get install libboost-all-dev libgsl0-dev
+  - make
+  - make -C tests
+
+To compile and run tests. After this the functions ported in
+PyTandem.cpp will be importable from PyTandem.
+
+This should work most of the time on ubuntu. Depending on you
+installation some more packages might have to be installed via the
+package manage. On other distros the apt-get command will fail.
+
+If you are using windows: Create an ubuntu virtual machine or this
+code base will be most probably be a living hell to use.
+
+
+
+
